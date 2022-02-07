@@ -1,4 +1,4 @@
-# Covid-19 and Weather travel planner 
+Pandemic Travel Planner 
 
 ## Overview 
 
