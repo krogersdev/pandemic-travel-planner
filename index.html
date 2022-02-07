@@ -13,17 +13,42 @@
 <title>Pandemic Travel Planner</title>
 </head>
 <body>
-    <nav class="blue darken-2">
-        <div class="nav-wrapper container">
-          <a href="#" class="brand-logo" id="home-page-link">Pandemic Travel Planner</a>
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="#">search</a></li>
-            <li><a href="#">bookmark</a></li>
-          </ul>
-        </div>
-      </nav>
-    <div id="main" class="container center-align" >     
+  <nav class="blue darken-2">
+     <div class="nav-wrapper container">
+      <a href="#" class="brand-logo" id="home-page-link">Pandemic Travel Planner</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li><a href="#" id="search-page-link">search Locations</a></li>
+        <!-- <li><a href="#">bookmark</a></li> -->
+      </ul>
+     </div>
+  </nav>
+  <div class="container"> 
+    <div id="main">
+    <h2>Coronavirus and Weather data</h2>
+    <table class="highlight">
+      <thead>
+        <tr>
+            <th>Cases</th>
+            <th>Deaths</th>
+            <th>Active</th>
+            <th>Tests</th>
+            <th>Recovered</th>
+            <th>Population</th>
+          </tr>
+    </thead>
+      <tbody>
+        <tr>
+            <td>cases</td>
+            <td>deaths</td>
+            <td>active</td>
+            <td>tests</td>
+            <td>recovered</td>
+            <td>population</td>
+        </tr>
+      </tbody>
+    </table>
     </div>
+  </div>
     <script src="javascript/index.js"></script>
 </body>
 </html> 
