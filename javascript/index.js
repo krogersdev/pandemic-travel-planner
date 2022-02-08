@@ -1,13 +1,16 @@
     /** Globals **/
-
-   
+    const dataUrl = "https://disease.sh/v3/covid-19/states?sort=cases%2C%20tests%2C%20deaths%2C%20active%2C%20recovered%2C%20population&yesterday=yesterday"
+    let allStates = [];
+      
     /** NODE Getters **/
-    const mainDiv = () => document.getElementById("main");
+    const mainDiv = () => document.querySelector("#main");
 
-    const homePageLink = () => document.getElementById("home-page-link");
+    const homePageLink = () => document.querySelector("#home-page-link");
 
-    const searchPageLink = () => document.getElementById ("search-page-link");
+    const searchPageLink = () => document.querySelector ("#search-page-link");
 
+    const tableBody = () => document.querySelector("#tableBody");
+    
     // debugger;
 
     /** Templates **/
@@ -57,28 +60,21 @@
     /** Renderers **/
    const renderHomePage = () => {
        mainDiv().innerHTML = homePageTemplate();
-   }
+   };
 
    const renderSearchPage = () => {
        mainDiv().innerHTML = searchPageTemplate();
    };
-
-     /** When the DOM Loads **/
-    document.addEventListener('DOMContentLoaded', () => {
-        renderHomePage();
-        homePageLinkEvent();
-        searchPageLinkEvent();
-    });    
-
-    /** Events **/
-    const homePageLinkEvent = () => {
-        homePageLink().addEventListener('click', (e) => {
-            e.preventDefault();
-            renderHomePage();
-            
+   
+   /** Events **/
+   const homePageLinkEvent = () => {
+       homePageLink().addEventListener('click', (e) => {
+           e.preventDefault();
+           renderHomePage();
+           
         });
     };
-
+    
     const searchPageLinkEvent = () => {
         searchPageLink().addEventListener('click', (e) => {
             e.preventDefault();
@@ -86,6 +82,20 @@
             
         });  
     };
-   
 
+    fetch(dataUrl)
+    .then(response => response.json())
+    .then(data => {
+        allStates = data   
+        console.log(allStates)
+    });
+
+    
+    /** When the DOM Loads **/
+   document.addEventListener('DOMContentLoaded', () => {
+       renderHomePage();
+       homePageLinkEvent();
+       searchPageLinkEvent();
+   });    
+    
 
