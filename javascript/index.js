@@ -1,6 +1,6 @@
     /** Globals **/
 
-
+   
     /** NODE Getters **/
     const mainDiv = () => document.getElementById("main");
 
@@ -13,16 +13,24 @@
     /** Templates **/
     const homePageTemplate = () => {
         return ` 
-        <h2 class="center-align">Welcome to our Pandemic Travel Planner</h2>
+        <h2>Welcome to our Pandemic Travel Planner</h2>
         `
     };
 
     const searchPageTemplate = () => {
         return `
         <h2>Coronavirus and Weather data</h2>
+        <div class="row">
+            <form class="input-field col s6">
+                <input type="search" id="stateSearch" placeholder="Lookup by state" size="50">
+                <span class="helper-text">e.g. Florida</span><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
         <table class="highlight">
           <thead>
             <tr>
+                <th>State</th>
                 <th>Cases</th>
                 <th>Deaths</th>
                 <th>Active</th>
@@ -31,8 +39,9 @@
                 <th>Population</th>
               </tr>
         </thead>
-          <tbody>
+          <tbody id="tableBody">
             <tr>
+                <td>state</td>
                 <td>cases</td>
                 <td>deaths</td>
                 <td>active</td>
@@ -51,12 +60,12 @@
    }
 
    const renderSearchPage = () => {
-       mainDiv().innerhtml = searchPageTemplate();
+       mainDiv().innerHTML = searchPageTemplate();
    };
 
-   /** When the DOM Loads **/
+     /** When the DOM Loads **/
     document.addEventListener('DOMContentLoaded', () => {
-        // renderHomePage();
+        renderHomePage();
         homePageLinkEvent();
         searchPageLinkEvent();
     });    
@@ -73,8 +82,8 @@
     const searchPageLinkEvent = () => {
         searchPageLink().addEventListener('click', (e) => {
             e.preventDefault();
-            //calls render search location table page with data 
-
+            renderSearchPage();            
+            
         });  
     };
    
