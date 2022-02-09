@@ -1,22 +1,25 @@
     /** Globals **/
+
     const dataUrl = "https://disease.sh/v3/covid-19/states?sort=cases%2C%20tests%2C%20deaths%2C%20active%2C%20recovered%2C%20population&yesterday=yesterday"
-    let allStates = [];
-      
+   
+    let statesData = [];
+     
     /** NODE Getters **/
+
     const mainDiv = () => document.querySelector("#main");
 
     const homePageLink = () => document.querySelector("#home-page-link");
 
     const searchPageLink = () => document.querySelector ("#search-page-link");
 
-    const tableBody = () => document.querySelector("#tableBody");
+    // const tableBody = () => document.querySelector("#tableBody");
     
-    // debugger;
+    
 
     /** Templates **/
     const homePageTemplate = () => {
         return ` 
-        <h2>Welcome to our Pandemic Travel Planner</h2>
+        <h2 class="center-align">Welcome to our Pandemic Travel Planner</h2>
         `
     };
 
@@ -43,19 +46,26 @@
               </tr>
         </thead>
           <tbody id="tableBody">
-            <tr>
-                <td>state</td>
-                <td>cases</td>
-                <td>deaths</td>
-                <td>active</td>
-                <td>tests</td>
-                <td>recovered</td>
-                <td>population</td>
-            </tr>
+          ${renderHomePage()}
           </tbody>
         </table>
         `
     };
+
+    const tableBodyTemplate = (stateData) => {
+        return `
+        <tr>
+            <td>${stateData.state}</td>
+            <td>${stateData.cases}</td>
+            <td>${stateData.deaths}</td>
+            <td>${stateData.active}</td>
+            <td>${stateData.tests}</td>
+            <td>${stateData.recovered}</td>
+            <td>${stateData.population}</td>
+            </tr>
+        `
+    }; 
+    
     
     /** Renderers **/
    const renderHomePage = () => {
@@ -65,8 +75,20 @@
    const renderSearchPage = () => {
        mainDiv().innerHTML = searchPageTemplate();
    };
+
+   const renderTableBody = () => {
+    return statesData.map(stateData => tableBodyTemplate(stateData));
+   };   
+
    
-   /** Events **/
+//    /** Events **/
+
+   const loadData = async() => {
+     const resp = await fetch(dataUrl)
+     const data = await resp.json();
+     statesData = data;
+   }
+   
    const homePageLinkEvent = () => {
        homePageLink().addEventListener('click', (e) => {
            e.preventDefault();
@@ -76,26 +98,17 @@
     };
     
     const searchPageLinkEvent = () => {
-        searchPageLink().addEventListener('click', (e) => {
+        searchPageLink().addEventListener('click', async(e) => {
             e.preventDefault();
-            renderSearchPage();            
-            
+            await loadData();
+            renderSearchPage();              
         });  
     };
 
-    fetch(dataUrl)
-    .then(response => response.json())
-    .then(data => {
-        allStates = data   
-        console.log(allStates)
-    });
-
-    
-    /** When the DOM Loads **/
-   document.addEventListener('DOMContentLoaded', () => {
-       renderHomePage();
-       homePageLinkEvent();
-       searchPageLinkEvent();
-   });    
-    
+/** When the DOM Loads **/
+document.addEventListener('DOMContentLoaded', () => {
+    renderHomePage();
+    homePageLinkEvent();
+    searchPageLinkEvent();
+ }); 
 
