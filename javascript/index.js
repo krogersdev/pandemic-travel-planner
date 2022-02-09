@@ -43,6 +43,7 @@
                 <th>Tests</th>
                 <th>Recovered</th>
                 <th>Population</th>
+                <th>Updated</th>
               </tr>
         </thead>
           <tbody id="tableBody">
@@ -62,6 +63,7 @@
             <td>${stateData.tests.toLocaleString('en-US')}</td>
             <td>${stateData.recovered.toLocaleString('en-US')}</td>
             <td>${stateData.population.toLocaleString('en-US')}</td>
+            <td>${new Date(stateData.updated).toDateString()}</td>
             </tr>
         `
        tableBody().innerHTML+= tableData
