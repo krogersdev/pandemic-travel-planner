@@ -1,7 +1,7 @@
     /** Globals **/
 
-    const dataUrl = "https://disease.sh/v3/covid-19/states?sort=cases%2C%20tests%2C%20deaths%2C%20active%2C%20recovered%2C%20population&yesterday=yesterday"
-   
+    const dataUrl = "https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday"
+
     let statesData = [];
      
     /** NODE Getters **/
@@ -12,7 +12,7 @@
 
     const searchPageLink = () => document.querySelector ("#search-page-link");
 
-    // const tableBody = () => document.querySelector("#tableBody");
+    const tableBody = () => document.querySelector("#tableBody");
     
     
 
@@ -46,26 +46,27 @@
               </tr>
         </thead>
           <tbody id="tableBody">
-          ${renderHomePage()}
+          
           </tbody>
         </table>
         `
     };
 
     const tableBodyTemplate = (stateData) => {
-        return `
+        let tableData = `
         <tr>
             <td>${stateData.state}</td>
-            <td>${stateData.cases}</td>
-            <td>${stateData.deaths}</td>
-            <td>${stateData.active}</td>
-            <td>${stateData.tests}</td>
-            <td>${stateData.recovered}</td>
-            <td>${stateData.population}</td>
+            <td>${stateData.cases.toLocaleString('en-US')}</td>
+            <td>${stateData.deaths.toLocaleString('en-US')}</td>
+            <td>${stateData.active.toLocaleString('en-US')}</td>
+            <td>${stateData.tests.toLocaleString('en-US')}</td>
+            <td>${stateData.recovered.toLocaleString('en-US')}</td>
+            <td>${stateData.population.toLocaleString('en-US')}</td>
             </tr>
         `
+       tableBody().innerHTML+= tableData
+        
     }; 
-    
     
     /** Renderers **/
    const renderHomePage = () => {
@@ -74,12 +75,14 @@
 
    const renderSearchPage = () => {
        mainDiv().innerHTML = searchPageTemplate();
+       renderTableBody();
    };
 
    const renderTableBody = () => {
-    return statesData.map(stateData => tableBodyTemplate(stateData));
-   };   
+    return statesData.forEach(stateData => tableBodyTemplate(stateData))
 
+   };   
+  
    
 //    /** Events **/
 
@@ -101,6 +104,7 @@
         searchPageLink().addEventListener('click', async(e) => {
             e.preventDefault();
             await loadData();
+            
             renderSearchPage();              
         });  
     };
