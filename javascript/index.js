@@ -1,9 +1,9 @@
-/** Globals **/
+/*** Globals ***/
 const dataUrl = "https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday"
 
 let statesData = [];
     
-/** NODE Getters **/
+/*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
 
 const homePageLink = () => document.querySelector("#home-page-link");
@@ -13,6 +13,11 @@ const searchPageLink = () => document.querySelector ("#search-page-link");
 const tableBody = () => document.querySelector("#tableBody");
 
 const submitButton = () => document.querySelector("form");
+
+const lookUpState = () => document.querySelector('#stateSearch');//input comes from here 
+
+const matchList = () => document.querySelector('.match-list');// output list of states names to auto populate
+
 
 /** Templates **/
 const homePageTemplate = () => {
@@ -27,7 +32,8 @@ const searchPageTemplate = () => {
     <div class="row">
         <form class="input-field col s6">
             <label for="stateSearch">Lookup by state</label>
-            <input type="text" id="state" name="stateSearch" size="50">
+            <input type="text" id="stateSearch" name="state" onclick="onClick()" size="50">
+            <div class="match-list"></div>
             <span class="helper-text">e.g. Florida</span><br>
             <input type="submit" >
         </form>
@@ -69,14 +75,17 @@ const tableBodyTemplate = (stateData) => {
     
 }; 
 
-/** Renderers **/
+
+
+
+/*** Renderers ***/
 const renderHomePage = () => {
     mainDiv().innerHTML = homePageTemplate();
 };
 
 const renderSearchPage = () => {
     mainDiv().innerHTML = searchPageTemplate()
-    renderTableBody()
+    renderTableBody();
     
 };
 
@@ -85,14 +94,15 @@ return statesData.forEach(stateData => tableBodyTemplate(stateData))
     
 };   
 
-/** Events **/
+/*** Events ***/
+ const onClick = () => {
+    lookUpState().addEventListener('input', (e) => {
+        let match = e.target.value
+        console.log(match)
 
-const submitEvent = () => {
-    submitButton().addEventListener('submit', (e) => {
-        e.preventDefault();
-        console.log(e)   
+
     })
-};
+ }
 
 const loadData = async() => {
     const resp = await fetch(dataUrl)
@@ -112,12 +122,13 @@ const searchPageLinkEvent = () => {
     searchPageLink().addEventListener('click', async(e) => {
         e.preventDefault();
         await loadData();
-        await renderSearchPage(); 
-        submitEvent();          
+        await renderSearchPage();
+        
+        // submitEvent();          
     });  
 };
 
-/** When the DOM Loads **/
+/*** When the DOM Loads ***/
 document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();
     homePageLinkEvent();
