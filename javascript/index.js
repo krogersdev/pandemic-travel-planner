@@ -12,12 +12,11 @@ const searchPageLink = () => document.querySelector ("#search-page-link");
 
 const tableBody = () => document.querySelector("#tableBody");
 
-const submitButton = () => document.querySelector("form");
+const selectForm = () => document.querySelector("form");
 
 const lookUpState = () => document.querySelector('#stateSearch');//input comes from here 
 
-const matchList = () => document.querySelector('.match-list');// output list of states names to auto populate
-
+const matchList = () => document.querySelector('#match-list');// output list of states names to auto populate
 
 /** Templates **/
 const homePageTemplate = () => {
@@ -31,9 +30,9 @@ const searchPageTemplate = () => {
     <h2>Coronavirus and Weather data</h2>
     <div class="row">
         <form class="input-field col s6">
-            <label for="stateSearch">Lookup by state</label>
-            <input type="text" id="stateSearch" name="state" onclick="onClick()" size="50">
-            <div class="match-list"></div>
+            <label for="stateSearch">Lookup by state</label><br>
+            <input list="match-list" id="stateSearch" onclick ="inputEvent()"  name="match-list" size="50">
+            <datalist id="match-list"></datalist>
             <span class="helper-text">e.g. Florida</span><br>
             <input type="submit" >
         </form>
@@ -72,11 +71,13 @@ const tableBodyTemplate = (stateData) => {
         </tr>
     `
     tableBody().innerHTML+= tableData
-    
 }; 
 
-
-
+const searchInputTemplate = (match) => {
+    const option = document.createElement('option')
+    option.value = match.state
+    matchList().append(option)
+};
 
 /*** Renderers ***/
 const renderHomePage = () => {
@@ -90,25 +91,34 @@ const renderSearchPage = () => {
 };
 
 const renderTableBody = () => {
-return statesData.forEach(stateData => tableBodyTemplate(stateData))
-    
+return statesData.forEach(stateData => tableBodyTemplate(stateData))   
 };   
 
+const renderSearchInput = (match) => {
+     matchList().innerHTML = ""
+     match.map(state => searchInputTemplate(state))
+};
+
 /*** Events ***/
- const onClick = () => {
-    lookUpState().addEventListener('input', (e) => {
-        let match = e.target.value
-        console.log(match)
+const inputEvent = () => {
+    lookUpState().addEventListener('input', (event) => {
+        event.preventDefault()
+        let searchText = (event.target.value)
+                       
+        let match = statesData.filter(name => {
+            let stateName = (name.state).toLowerCase()
 
-
-    })
- }
+            return stateName.startsWith(searchText)
+        })
+        renderSearchInput(match)
+    })    
+};
 
 const loadData = async() => {
     const resp = await fetch(dataUrl)
     const data = await resp.json();
     statesData = data;
-}
+};
 
 const homePageLinkEvent = () => {
     homePageLink().addEventListener('click', (e) => {
