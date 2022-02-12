@@ -29,12 +29,13 @@ const searchPageTemplate = () => {
     return `
     <h2>Coronavirus and Weather data</h2>
     <div class="row">
-        <form class="input-field col s6">
-            <label for="stateSearch">Lookup by state</label><br>
-            <input list="match-list" id="stateSearch" onclick ="inputEvent()"  name="match-list" size="50">
-            <datalist id="match-list"></datalist>
-            <span class="helper-text">e.g. Florida</span><br>
-            <input type="submit" >
+        <form class="col s6">
+            <label for="stateSearch" class="active">Lookup by state</label><br>
+            <input type="text" list="match-list" id="stateSearch" onchange ="inputEvent()" name="stateSearch" size="50">
+                <datalist id="match-list"></datalist>
+                <span class="helper-text">e.g. Florida</span>
+                <br>
+            <input type="submit" id="submitEvent">
         </form>
     </div>
     <table class="highlight">
@@ -57,26 +58,27 @@ const searchPageTemplate = () => {
     `
 };
 
-const tableBodyTemplate = (stateData) => {
-    let tableData = `
+const tableBodyTemplate = (stateObj) => {
+     let tableData = `
     <tr>
-        <td>${stateData.state}</td>
-        <td>${stateData.cases.toLocaleString('en-US')}</td>
-        <td>${stateData.deaths.toLocaleString('en-US')}</td>
-        <td>${stateData.active.toLocaleString('en-US')}</td>
-        <td>${stateData.tests.toLocaleString('en-US')}</td>
-        <td>${stateData.recovered.toLocaleString('en-US')}</td>
-        <td>${stateData.population.toLocaleString('en-US')}</td>
-        <td>${new Date(stateData.updated).toDateString()}</td>
-        </tr>
+    <td>${stateObj.state}</td>
+    <td>${stateObj.cases.toLocaleString('en-US')}</td>
+    <td>${stateObj.deaths.toLocaleString('en-US')}</td>
+    <td>${stateObj.active.toLocaleString('en-US')}</td>
+    <td>${stateObj.tests.toLocaleString('en-US')}</td>
+    <td>${stateObj.recovered.toLocaleString('en-US')}</td>
+    <td>${stateObj.population.toLocaleString('en-US')}</td>
+    <td>${new Date(stateObj.updated).toDateString()}</td>
+    </tr>
     `
+    
     tableBody().innerHTML+= tableData
 }; 
 
-const searchInputTemplate = (match) => {
+const searchInputTemplate = (name) => {   //possible change to autocomplete
     const option = document.createElement('option')
-    option.value = match.state
-    matchList().append(option)
+    option.value = name.state
+    matchList().appendChild(option)
 };
 
 /*** Renderers ***/
@@ -85,32 +87,53 @@ const renderHomePage = () => {
 };
 
 const renderSearchPage = () => {
+    let stateArray = statesData
     mainDiv().innerHTML = searchPageTemplate()
-    renderTableBody();
-    
+    renderTableBody(stateArray);
 };
 
-const renderTableBody = () => {
-return statesData.forEach(stateData => tableBodyTemplate(stateData))   
+const renderTableBody = (stateArray) => {
+    let data = stateArray
+    data.map(stateObj => tableBodyTemplate(stateObj))   
 };   
 
-const renderSearchInput = (match) => {
+const renderSearchInput = (matchingObj) => {    
+    let data = matchingObj
      matchList().innerHTML = ""
-     match.map(state => searchInputTemplate(state))
+     data.map(name => searchInputTemplate(name)) //possible change to autocomplete
 };
 
+/** Event Handler */
+const eventHandler = (searchText) => {
+    let input = searchText.toLowerCase()
+
+    let matchingObj = statesData.filter(name => {
+        
+        let stateName = (name.state).toLowerCase()
+        return stateName.startsWith(input)
+    })   
+        return matchingObj
+}
+
 /*** Events ***/
+const submitEvent = () => {
+    selectForm().addEventListener('submit', (event) => {
+        event.preventDefault();
+        let stateInput = (event.target[0].value)
+        let matchingObj = eventHandler(stateInput)
+        tableBody().innerHTML = ""
+        renderTableBody(matchingObj)
+    })
+}
 const inputEvent = () => {
     lookUpState().addEventListener('input', (event) => {
         event.preventDefault()
-        let searchText = (event.target.value)
-                       
-        let match = statesData.filter(name => {
-            let stateName = (name.state).toLowerCase()
-
-            return stateName.startsWith(searchText)
-        })
-        renderSearchInput(match)
+        if(event.target.value === ""){
+            renderSearchPage()
+        }
+       let inputText = (event.target.value)
+       let matchingObj = eventHandler(inputText) 
+       renderSearchInput(matchingObj)
     })    
 };
 
@@ -123,8 +146,7 @@ const loadData = async() => {
 const homePageLinkEvent = () => {
     homePageLink().addEventListener('click', (e) => {
         e.preventDefault();
-        renderHomePage();
-        
+        renderHomePage();       //takes user back to homepage when clicked 
     });
 };
 
@@ -133,8 +155,7 @@ const searchPageLinkEvent = () => {
         e.preventDefault();
         await loadData();
         await renderSearchPage();
-        
-        // submitEvent();          
+        submitEvent();
     });  
 };
 
@@ -142,6 +163,5 @@ const searchPageLinkEvent = () => {
 document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();
     homePageLinkEvent();
-    searchPageLinkEvent();
- }); 
-
+    searchPageLinkEvent();        
+})
