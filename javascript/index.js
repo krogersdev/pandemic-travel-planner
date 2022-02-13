@@ -31,7 +31,7 @@ const searchPageTemplate = () => {
     <div class="row">
         <form class="col s6">
             <label for="stateSearch" class="active">Lookup by state</label><br>
-            <input type="text" list="match-list" id="stateSearch" onchange ="inputEvent()" name="stateSearch" size="50">
+            <input type="text" list="match-list" id="stateSearch" name="stateSearch" size="50">
                 <datalist id="match-list"></datalist>
                 <span class="helper-text">e.g. Florida</span>
                 <br>
@@ -113,28 +113,36 @@ const eventHandler = (searchText) => {
         return stateName.startsWith(input)
     })   
         return matchingObj
+        
 }
+
+
+
 
 /*** Events ***/
 const submitEvent = () => {
     selectForm().addEventListener('submit', (event) => {
-        event.preventDefault();
-        let stateInput = (event.target[0].value)
+        event.preventDefault()
+        let stateInput = (event.target[0].value)  //create error handler 
         let matchingObj = eventHandler(stateInput)
+        console.log(matchingObj)
         tableBody().innerHTML = ""
         renderTableBody(matchingObj)
-    })
+        inputEvent()
+    }, true);
 }
 const inputEvent = () => {
-    lookUpState().addEventListener('input', (event) => {
+    lookUpState().addEventListener('change', (event) => {
+        console.log('inputEvent')
         event.preventDefault()
-        if(event.target.value === ""){
-            renderSearchPage()
-        }
+
+        if(event.target.value === "") renderSearchPage()
+
        let inputText = (event.target.value)
        let matchingObj = eventHandler(inputText) 
        renderSearchInput(matchingObj)
-    })    
+       submitEvent();
+    }, true)    
 };
 
 const loadData = async() => {
@@ -144,8 +152,8 @@ const loadData = async() => {
 };
 
 const homePageLinkEvent = () => {
-    homePageLink().addEventListener('click', (e) => {
-        e.preventDefault();
+    homePageLink().addEventListener('click', (event) => {
+        event.preventDefault();
         renderHomePage();       //takes user back to homepage when clicked 
     });
 };
@@ -154,14 +162,15 @@ const searchPageLinkEvent = () => {
     searchPageLink().addEventListener('click', async(e) => {
         e.preventDefault();
         await loadData();
-        await renderSearchPage();
-        submitEvent();
+        renderSearchPage();
+        inputEvent();
+        
     });  
 };
 
 /*** When the DOM Loads ***/
 document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();
+    searchPageLinkEvent();      // Loads data/API call + render/display data the page    
     homePageLinkEvent();
-    searchPageLinkEvent();        
 })
