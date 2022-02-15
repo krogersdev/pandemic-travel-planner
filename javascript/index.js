@@ -1,8 +1,8 @@
-/*** Globals ***/
+/** Globals **/
 const dataUrl = "https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday"
 
 let statesData = [];
-    
+
 /*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
 
@@ -17,6 +17,7 @@ const selectForm = () => document.querySelector("form");
 const lookUpState = () => document.querySelector('#stateSearch');//input comes from here 
 
 const matchList = () => document.querySelector('#match-list');// output list of states names to auto populate
+
 
 /** Templates **/
 const homePageTemplate = () => {
@@ -35,7 +36,7 @@ const searchPageTemplate = () => {
                 <datalist id="match-list"></datalist>
                 <span class="helper-text">e.g. Florida</span>
                 <br>
-            <input type="submit" id="submitEvent">
+            <input type="submit">
         </form>
     </div>
     <table class="highlight">
@@ -75,77 +76,78 @@ const tableBodyTemplate = (stateObj) => {
     tableBody().innerHTML+= tableData
 }; 
 
-const searchInputTemplate = (name) => {   //possible change to autocomplete
-    const option = document.createElement('option')
-    option.value = name.state
-    matchList().appendChild(option)
-};
 
-/*** Renderers ***/
+/** Renderers **/
 const renderHomePage = () => {
     mainDiv().innerHTML = homePageTemplate();
+    
 };
 
 const renderSearchPage = () => {
-    let stateArray = statesData
-    mainDiv().innerHTML = searchPageTemplate()
-    renderTableBody(stateArray);
+    mainDiv().innerHTML = searchPageTemplate()  //table tags are updated 
+    renderStatesToDataList(); 
+    renderTable(statesData);
 };
 
-const renderTableBody = (stateArray) => {
-    let data = stateArray
-    data.map(stateObj => tableBodyTemplate(stateObj))   
-};   
-
-const renderSearchInput = (matchingObj) => {    
-    let data = matchingObj
-     matchList().innerHTML = ""
-     data.map(name => searchInputTemplate(name)) //possible change to autocomplete
+const renderStatesToDataList = () => {   //possible change to autocomplete
+    return statesData.map(elem => { 
+        const option = document.createElement('option')
+        option.value = elem.state
+        matchList().appendChild(option)
+    });
 };
 
-/** Event Handler */
-const eventHandler = (searchText) => {
-    let input = searchText.toLowerCase()
+const renderTable = (statesData) => {
+    
+    return statesData.map(stateObj => { 
 
-    let matchingObj = statesData.filter(name => {
+        tableBodyTemplate(stateObj)  //mapping objects/data to table 
+    });
+};
+
+
+/** Event Handler  **/
+const eventHandler = (event) => {
+    let stateObjsArr = statesData
+
+    let input = event
+
+    if( input.length < 0 ) {
+      
+        renderTable(stateObjsArr)
+    }
+   
+    let matches = stateObjsArr.filter(obj => { 
+        const regex = new RegExp(`^${input}`, 'gi');
+        return obj.state.match(regex)
         
-        let stateName = (name.state).toLowerCase()
-        return stateName.startsWith(input)
-    })   
-        return matchingObj
-        
+                
+    })
+    tableBody().innerHTML = ""
+    renderTable(matches);
+    //filter the data and perform a match with if else stmts base on submit 
 }
 
 
+/** Events **/
+const onChangeEvent = () => {
+    lookUpState().addEventListener('input', (event) => {
+    event.preventDefault();
+    console.log(event.target.value)
+     nIntervId = setInterval(eventHandler(event.target.value), 3000)
+console.log(nIntervId)
+    })
 
+}
 
-/*** Events ***/
 const submitEvent = () => {
     selectForm().addEventListener('submit', (event) => {
-        event.preventDefault()
-        let stateInput = (event.target[0].value)  //create error handler 
-        let matchingObj = eventHandler(stateInput)
-        console.log(matchingObj)
-        tableBody().innerHTML = ""
-        renderTableBody(matchingObj)
-        inputEvent()
-    }, true);
+        event.preventDefault();
+        eventHandler(event.target.stateSearch.value);
+    });
 }
-const inputEvent = () => {
-    lookUpState().addEventListener('change', (event) => {
-        console.log('inputEvent')
-        event.preventDefault()
 
-        if(event.target.value === "") renderSearchPage()
-
-       let inputText = (event.target.value)
-       let matchingObj = eventHandler(inputText) 
-       renderSearchInput(matchingObj)
-       submitEvent();
-    }, true)    
-};
-
-const loadData = async() => {
+const fetchApiData = async() => {
     const resp = await fetch(dataUrl)
     const data = await resp.json();
     statesData = data;
@@ -161,16 +163,17 @@ const homePageLinkEvent = () => {
 const searchPageLinkEvent = () => {
     searchPageLink().addEventListener('click', async(e) => {
         e.preventDefault();
-        await loadData();
+        await fetchApiData();
         renderSearchPage();
-        inputEvent();
-        
+        submitEvent();
+        onChangeEvent();
     });  
 };
 
+
 /*** When the DOM Loads ***/
 document.addEventListener('DOMContentLoaded', () => {
-    renderHomePage();
-    searchPageLinkEvent();      // Loads data/API call + render/display data the page    
+    renderHomePage();  
     homePageLinkEvent();
+    searchPageLinkEvent();         
 })
