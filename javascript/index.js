@@ -1,7 +1,10 @@
 /** Globals **/
-const dataUrl = "https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday"
+const covidApiUrl = 'https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday'
+
 
 let statesData = [];
+
+let weatherData = [];
 
 /*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
@@ -18,6 +21,9 @@ const lookUpState = () => document.querySelector('#stateSearch');//input comes f
 
 const matchList = () => document.querySelector('#match-list');// output list of states names to auto populate
 
+const forecastData = () => document.querySelector('#forecastData');// output list of states names to auto populate
+
+const updateForecastData = () => document.querySelector('.responsive');// output list of states names to auto populate
 
 /** Templates **/
 const homePageTemplate = () => {
@@ -54,12 +60,14 @@ const searchPageTemplate = () => {
     </thead>
         <tbody id="tableBody">
         
+        
         </tbody>
     </table>
     `
 };
 
 const tableBodyTemplate = (stateObj) => {
+
      let tableData = `
     <tr>
     <td>${stateObj.state}</td>
@@ -71,87 +79,147 @@ const tableBodyTemplate = (stateObj) => {
     <td>${stateObj.population.toLocaleString('en-US')}</td>
     <td>${new Date(stateObj.updated).toDateString()}</td>
     </tr>
+    
     `
     
     tableBody().innerHTML+= tableData
 }; 
 
+const weatherDataTemplate = () => {
+    let table = document.createElement('TABLE');
+    table.className = "responsive"
+    
+    const weatherTemplate = `
+    <tbody>
+    <tr id="forecastData"></tr>
+    </tbody>
+    `    
+
+    table.innerHTML = weatherTemplate
+
+    mainDiv().append(table)
+};
+
+const weatherForecastData = (forecast) => {
+
+    console.log(forecast);
+   
+     let weatherCard = `
+    <td>
+        <p class="p"> 
+            <strong>
+            ${new Date((forecast.date).replace(/-/g, '\/')).toDateString()}
+            </strong>
+        </p> 
+        <img style="width: 64px;" src='https:${forecast.day.condition.icon}' alt="${forecast.day.condition.text}"> 
+        <br>
+            ${forecast.day.condition.text}
+        <br>
+        <span style="color:red;">Hi: ${forecast.day.maxtemp_f} F
+        </span>
+            "/"
+        <span style="color:blue;">Lo: ${forecast.day.mintemp_f} F
+        </span>
+    </td>
+    
+`
+    forecastData().innerHTML += weatherCard
+};
 
 /** Renderers **/
+
+const renderWeatherData = (forecast) => {
+    forecastData().innerHTML =""
+    
+    forecast.forEach(map => weatherForecastData(map))
+}
+
 const renderHomePage = () => {
     mainDiv().innerHTML = homePageTemplate();
-    
 };
 
 const renderSearchPage = () => {
-    mainDiv().innerHTML = searchPageTemplate()  //table tags are updated 
-    renderStatesToDataList(); 
+    mainDiv().innerHTML = searchPageTemplate();  
+    renderAutocompleteList(); 
     renderTable(statesData);
 };
 
-const renderStatesToDataList = () => {   //possible change to autocomplete
+const renderAutocompleteList = () => {   
     return statesData.map(elem => { 
-        const option = document.createElement('option')
+
+        const option = document.createElement('option');
         option.value = elem.state
-        matchList().appendChild(option)
+
+        matchList().append(option);
     });
 };
 
 const renderTable = (statesData) => {
-    
-    return statesData.map(stateObj => { 
-
-        tableBodyTemplate(stateObj)  //mapping objects/data to table 
-    });
+    return statesData.map( stateObj => tableBodyTemplate(stateObj) );
 };
-
 
 /** Event Handler  **/
 const eventHandler = (event) => {
-    let stateObjsArr = statesData
+    let stateObjsArr = statesData;
+    let input = event;
 
-    let input = event
-
-    if( input.length < 0 ) {
-      
-        renderTable(stateObjsArr)
+    if ( input.length < 1 ) {
+      renderTable(stateObjsArr);
+      clearInterval(nIntervId);
     }
    
     let matches = stateObjsArr.filter(obj => { 
         const regex = new RegExp(`^${input}`, 'gi');
+
+       
         return obj.state.match(regex)
-        
-                
     })
-    tableBody().innerHTML = ""
-    renderTable(matches);
-    //filter the data and perform a match with if else stmts base on submit 
+    
+        tableBody().innerHTML = "";
+    
+        renderTable(matches);
+    
 }
 
-
 /** Events **/
-const onChangeEvent = () => {
-    lookUpState().addEventListener('input', (event) => {
-    event.preventDefault();
-    console.log(event.target.value)
-     nIntervId = setInterval(eventHandler(event.target.value), 3000)
-console.log(nIntervId)
-    })
+const inputEvent = () => {
 
+    lookUpState().addEventListener('onchange', (event) => {
+        event.preventDefault();
+
+        nIntervId = setInterval(eventHandler(event.target.value), 4000)
+        console.log(nIntervId)
+    })
 }
 
 const submitEvent = () => {
+
     selectForm().addEventListener('submit', (event) => {
         event.preventDefault();
+        // updateForecastData().innerHTML=""
+        weatherDataTemplate()
+        getWeatherData(event.target.stateSearch.value);
+
         eventHandler(event.target.stateSearch.value);
+        debugger
     });
 }
 
-const fetchApiData = async() => {
-    const resp = await fetch(dataUrl)
+const loadCovidApiData = async() => {
+    const resp = await fetch(covidApiUrl)
     const data = await resp.json();
     statesData = data;
 };
+
+function getWeatherData(stateName) {
+    fetch(`http://api.weatherapi.com/v1/forecast.json?key=eaa20489464147259db164348221602&q=${stateName},America/Puerto_Rico&days=5&aqi=no&alerts=no`)
+    .then(res => res.json())
+    .then(data => {
+        let weatherData = Object.entries(data.forecast)
+        weatherData.forEach(forecast => renderWeatherData(forecast[1]))
+        
+    })
+}
 
 const homePageLinkEvent = () => {
     homePageLink().addEventListener('click', (event) => {
@@ -163,10 +231,10 @@ const homePageLinkEvent = () => {
 const searchPageLinkEvent = () => {
     searchPageLink().addEventListener('click', async(e) => {
         e.preventDefault();
-        await fetchApiData();
+        await loadCovidApiData();
         renderSearchPage();
         submitEvent();
-        onChangeEvent();
+        inputEvent();
     });  
 };
 
@@ -175,5 +243,6 @@ const searchPageLinkEvent = () => {
 document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();  
     homePageLinkEvent();
-    searchPageLinkEvent();         
+    searchPageLinkEvent();   
+          
 })
