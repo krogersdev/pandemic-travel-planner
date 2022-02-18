@@ -1,7 +1,6 @@
 /** Globals **/
 const covidApiUrl = 'https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday'
 
-
 let statesData = [];
 
 let weatherData = [];
@@ -21,32 +20,36 @@ const lookUpState = () => document.querySelector('#stateSearch');//input comes f
 
 const matchList = () => document.querySelector('#match-list');// output list of states names to auto populate
 
-const forecastData = () => document.querySelector('#forecastData');// output list of states names to auto populate
+const forecastData = () => document.querySelector('#forecastData');// output weather information for single state
 
-const updateForecastData = () => document.querySelector('.responsive');// output list of states names to auto populate
+const updateForecastData = () => document.querySelector('.responsive');
 
 /** Templates **/
 const homePageTemplate = () => {
     return ` 
-    <h2 class="center-align">Welcome to our Pandemic Travel Planner</h2>
+    <h1 class="center-align">Welcome to our Pandemic Travel Planner</h1>
+    <br>
+    <p>This pandemic travel planner was created for domestic united states travelers. The search locations feature allows users to compare updated statistics and weather forecast by state, assisting you to make informed trip decisions.</p>
     `
 };
 
 const searchPageTemplate = () => {
     return `
-    <h2>Coronavirus and Weather data</h2>
+    <h1>Coronavirus Travel location and weather forecast</h1>
     <div class="row">
         <form class="col s6">
             <label for="stateSearch" class="active">Lookup by state</label><br>
             <input type="text" list="match-list" id="stateSearch" name="stateSearch" size="50">
                 <datalist id="match-list"></datalist>
-                <span class="helper-text">e.g. Florida</span>
+                <span class="helper-text">Cases and weather per state: e.g. Florida</span>
                 <br>
             <input type="submit">
         </form>
     </div>
     <table class="highlight">
         <thead>
+        <div>Sorted by: Active cases</div>
+
         <tr>
             <th>State</th>
             <th>Cases</th>
@@ -101,9 +104,6 @@ const weatherDataTemplate = () => {
 };
 
 const weatherForecastData = (forecast) => {
-
-    console.log(forecast);
-   
      let weatherCard = `
     <td>
         <p class="p"> 
@@ -127,7 +127,6 @@ const weatherForecastData = (forecast) => {
 };
 
 /** Renderers **/
-
 const renderWeatherData = (forecast) => {
     forecastData().innerHTML =""
     
@@ -163,21 +162,23 @@ const eventHandler = (event) => {
     let stateObjsArr = statesData;
     let input = event;
 
-    if ( input.length < 1 ) {
-      renderTable(stateObjsArr);
-      clearInterval(nIntervId);
-    }
-   
     let matches = stateObjsArr.filter(obj => { 
         const regex = new RegExp(`^${input}`, 'gi');
-
-       
+        
         return obj.state.match(regex)
     })
-    
+
+    if ( matches.length === 1 ) {
         tableBody().innerHTML = "";
-    
         renderTable(matches);
+        weatherDataTemplate()
+        getWeatherData(matches)
+
+    } else if(matches.length > 1) {
+        tableBody().innerHTML = "";
+        renderTable(matches)
+        forecastData().innerHTML =""
+    }
     
 }
 
@@ -186,9 +187,7 @@ const inputEvent = () => {
 
     lookUpState().addEventListener('onchange', (event) => {
         event.preventDefault();
-
-        nIntervId = setInterval(eventHandler(event.target.value), 4000)
-        console.log(nIntervId)
+        eventHandler(event.target.value)
     })
 }
 
@@ -196,12 +195,7 @@ const submitEvent = () => {
 
     selectForm().addEventListener('submit', (event) => {
         event.preventDefault();
-        // updateForecastData().innerHTML=""
-        weatherDataTemplate()
-        getWeatherData(event.target.stateSearch.value);
-
         eventHandler(event.target.stateSearch.value);
-        debugger
     });
 }
 
@@ -217,7 +211,6 @@ function getWeatherData(stateName) {
     .then(data => {
         let weatherData = Object.entries(data.forecast)
         weatherData.forEach(forecast => renderWeatherData(forecast[1]))
-        
     })
 }
 
@@ -237,7 +230,6 @@ const searchPageLinkEvent = () => {
         inputEvent();
     });  
 };
-
 
 /*** When the DOM Loads ***/
 document.addEventListener('DOMContentLoaded', () => {
