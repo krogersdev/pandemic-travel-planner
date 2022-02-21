@@ -31,7 +31,11 @@ const homePageTemplate = () => {
     return ` 
     <h1 class="center-align">Welcome to our Pandemic Travel Planner</h1>
     <br>
-    <p>This pandemic travel planner was created for domestic united states travelers. The search locations feature allows users to compare updated statistics and weather forecast by state, assisting you to make informed trip decisions.</p>
+    <p class="center-align, "flow-text">This pandemic travel planner was created for domestic united states travelers. The search locations feature allows users to compare updated statistics and weather forecast by state, assisting you to make informed trip decisions.</p>
+    <div class="valign-wrapper">
+    <img class="materialboxed, responsive-img"  width="auto" src="img/Picture1.png" alt="logo">
+    </div>
+    
     `
 };
 
