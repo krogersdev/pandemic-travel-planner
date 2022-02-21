@@ -5,6 +5,8 @@ let statesData = [];
 
 let weatherData = [];
 
+let forDeletion = ['Veteran Affairs', 'Diamond Princess Ship', 'Wuhan Repatriated', 'Grand Princess Ship', 'Federal Prisons', 'US Military', 'American Samoa']
+
 /*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
 
@@ -202,11 +204,13 @@ const submitEvent = () => {
 const loadCovidApiData = async() => {
     const resp = await fetch(covidApiUrl)
     const data = await resp.json();
-    statesData = data;
+    statesData = data
+    
+    statesData = statesData.filter(item => !forDeletion.includes(item.state));
 };
 
 function getWeatherData(stateName) {
-    fetch(`http://api.weatherapi.com/v1/forecast.json?key=eaa20489464147259db164348221602&q=${stateName},America/Puerto_Rico&days=5&aqi=no&alerts=no`)
+    fetch(`http://api.weatherapi.com/v1/forecast.json?key=eaa20489464147259db164348221602&q=${stateName[0].state},America/Puerto_Rico&days=5&aqi=no&alerts=no`)
     .then(res => res.json())
     .then(data => {
         let weatherData = Object.entries(data.forecast)
