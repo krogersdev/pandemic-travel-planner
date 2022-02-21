@@ -1,11 +1,17 @@
 /** Globals **/
-const covidApiUrl = 'https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday'
+const covidApiUrl = 'https://disease.sh/v3/covid-19/states?sort=active&yesterday=yesterday';
+
+const baseUrl = 'http://api.weatherapi.com/v1';
+
+const apiKey = 'eaa20489464147259db164348221602';
+
+const endPoint = 'America/Puerto_Rico&days=5&aqi=no&alerts=no';
 
 let statesData = [];
 
 let weatherData = [];
 
-let forDeletion = ['Veteran Affairs', 'Diamond Princess Ship', 'Wuhan Repatriated', 'Grand Princess Ship', 'Federal Prisons', 'US Military', 'American Samoa']
+let forDeletion = ['Veteran Affairs', 'Diamond Princess Ship', 'Wuhan Repatriated', 'Grand Princess Ship', 'Federal Prisons', 'US Military', 'American Samoa'];
 
 /*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
@@ -41,7 +47,7 @@ const homePageTemplate = () => {
 
 const searchPageTemplate = () => {
     return `
-    <h1>Coronavirus Travel location and weather forecast</h1>
+    <h1>Location data and weather forecast</h1>
     <div class="row">
         <form class="col s6">
             <label for="stateSearch" class="active">Lookup by state</label><br>
@@ -214,7 +220,7 @@ const loadCovidApiData = async() => {
 };
 
 function getWeatherData(stateName) {
-    fetch(`http://api.weatherapi.com/v1/forecast.json?key=eaa20489464147259db164348221602&q=${stateName[0].state},America/Puerto_Rico&days=5&aqi=no&alerts=no`)
+    fetch(`${baseUrl}/forecast.json?key=${apiKey}&q=${stateName[0].state},${endPoint}`)
     .then(res => res.json())
     .then(data => {
         let weatherData = Object.entries(data.forecast)
@@ -244,5 +250,4 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();  
     homePageLinkEvent();
     searchPageLinkEvent();   
-          
 })
