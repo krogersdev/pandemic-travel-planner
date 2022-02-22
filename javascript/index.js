@@ -22,13 +22,11 @@ const homePageLink = () => document.querySelector("#home-page-link");
 
 const searchPageLink = () => document.querySelector ("#search-page-link");
 
-const tableBody = () => document.querySelector("#tableBody");
+const covidDataTableBody = () => document.querySelector("#tableBody");
 
 const selectForm = () => document.querySelector("form");
 
-const lookUpState = () => document.querySelector('#stateSearch');//input comes from here 
-
-const matchList = () => document.querySelector('#match-list');// output list of states names to auto populate
+const autocompleteList = () => document.querySelector('#match-list');// output list of states names to auto populate
 
 const forecastData = () => document.querySelector('#forecastData');// output weather information for single state
 
@@ -100,7 +98,7 @@ const tableBodyTemplate = (stateObj) => {
     
     `
     
-    tableBody().innerHTML+= tableData;
+    covidDataTableBody().innerHTML+= tableData;
 }; 
 
 const weatherForecastData = (forecast) => {
@@ -127,7 +125,7 @@ const weatherForecastData = (forecast) => {
 
 /** Renderers **/
 const renderWeatherData = (forecast) => {
-    forecastData().innerHTML =""
+    forecastData().innerHTML ="";
     
     forecast.forEach(map => weatherForecastData(map))
 }
@@ -148,14 +146,14 @@ const renderAutocompleteList = () => {
         const option = document.createElement('option');
         option.value = elem.state
 
-        matchList().append(option);
+        autocompleteList().append(option);
     });
 };
 
 const renderCovidData = (statesData) => {
-    tableBody().innerHTML ="";
+    covidDataTableBody().innerHTML ="";
 
-    statesData.map( stateObj => tableBodyTemplate(stateObj) );
+    statesData.map(stateObj => tableBodyTemplate(stateObj));
 };
 
 /** Event Handler  **/
@@ -205,7 +203,7 @@ function getWeatherData(stateName) {
 const homePageLinkEvent = () => {
     homePageLink().addEventListener('click', (event) => {
         event.preventDefault();
-        renderHomePage();       //takes user back to homepage when clicked 
+        renderHomePage();       
     });
 };
 
