@@ -7,11 +7,13 @@ const apiKey = 'eaa20489464147259db164348221602';
 
 const endPoint = 'America/Puerto_Rico&days=5&aqi=no&alerts=no';
 
+
 let statesData = [];
 
 let weatherData = [];
 
-let forDeletion = ['Veteran Affairs', 'Diamond Princess Ship', 'Wuhan Repatriated', 'Grand Princess Ship', 'Federal Prisons', 'US Military', 'American Samoa'];
+const forDeletion = ['Veteran Affairs', 'Diamond Princess Ship', 'Wuhan Repatriated', 'Grand Princess Ship', 'Federal Prisons', 'US Military', 'American Samoa'];
+
 
 /*** NODE Getters ***/
 const mainDiv = () => document.querySelector("#main");
@@ -30,8 +32,6 @@ const matchList = () => document.querySelector('#match-list');// output list of 
 
 const forecastData = () => document.querySelector('#forecastData');// output weather information for single state
 
-const updateForecastData = () => document.querySelector('.responsive');
-
 /** Templates **/
 const homePageTemplate = () => {
     return ` 
@@ -41,7 +41,6 @@ const homePageTemplate = () => {
     <div class="valign-wrapper">
     <img class="materialboxed, responsive-img"  width="auto" src="img/Picture1.png" alt="logo">
     </div>
-    
     `
 };
 
@@ -61,7 +60,6 @@ const searchPageTemplate = () => {
     <table class="highlight">
         <thead>
         <div>Sorted by: Active cases</div>
-
         <tr>
             <th>State</th>
             <th>Cases</th>
@@ -74,10 +72,15 @@ const searchPageTemplate = () => {
             </tr>
     </thead>
         <tbody id="tableBody">
-        
-        
         </tbody>
+        <br>  
+
     </table>
+    <table class="responsive">
+        <tbody>
+            <tr id="forecastData"> </tr>
+        </tbody>
+    </table>  
     `
 };
 
@@ -97,23 +100,8 @@ const tableBodyTemplate = (stateObj) => {
     
     `
     
-    tableBody().innerHTML+= tableData
+    tableBody().innerHTML+= tableData;
 }; 
-
-const weatherDataTemplate = () => {
-    let table = document.createElement('TABLE');
-    table.className = "responsive"
-    
-    const weatherTemplate = `
-    <tbody>
-    <tr id="forecastData"></tr>
-    </tbody>
-    `    
-
-    table.innerHTML = weatherTemplate
-
-    mainDiv().append(table)
-};
 
 const weatherForecastData = (forecast) => {
      let weatherCard = `
@@ -132,9 +120,8 @@ const weatherForecastData = (forecast) => {
             "/"
         <span style="color:blue;">Lo: ${forecast.day.mintemp_f} F
         </span>
-    </td>
+    </td>`
     
-`
     forecastData().innerHTML += weatherCard
 };
 
@@ -152,7 +139,7 @@ const renderHomePage = () => {
 const renderSearchPage = () => {
     mainDiv().innerHTML = searchPageTemplate();  
     renderAutocompleteList(); 
-    renderTable(statesData);
+    renderCovidData(statesData);
 };
 
 const renderAutocompleteList = () => {   
@@ -165,46 +152,33 @@ const renderAutocompleteList = () => {
     });
 };
 
-const renderTable = (statesData) => {
-    return statesData.map( stateObj => tableBodyTemplate(stateObj) );
+const renderCovidData = (statesData) => {
+    tableBody().innerHTML ="";
+
+    statesData.map( stateObj => tableBodyTemplate(stateObj) );
 };
 
 /** Event Handler  **/
-const eventHandler = (event) => {
-    let stateObjsArr = statesData;
-    let input = event;
-
-    let matches = stateObjsArr.filter(obj => { 
-        const regex = new RegExp(`^${input}`, 'gi');
+const eventHandler = (userInput) => {
+    console.log(userInput);
+    let matches = statesData.filter(obj => { 
+        const regex = new RegExp(`^${userInput}`, 'gi');
         
         return obj.state.match(regex)
     })
-
-    if ( matches.length === 1 ) {
-        tableBody().innerHTML = "";
-        renderTable(matches);
-        weatherDataTemplate()
+        console.log('filtered',matches);
+    if (matches.length === 1) {
+        renderCovidData(matches);
         getWeatherData(matches)
 
     } else if(matches.length > 1) {
-        tableBody().innerHTML = "";
-        renderTable(matches)
-        forecastData().innerHTML =""
+        forecastData().innerHTML =""; 
+        renderCovidData(matches)
     }
-    
 }
 
 /** Events **/
-const inputEvent = () => {
-
-    lookUpState().addEventListener('onchange', (event) => {
-        event.preventDefault();
-        eventHandler(event.target.value)
-    })
-}
-
 const submitEvent = () => {
-
     selectForm().addEventListener('submit', (event) => {
         event.preventDefault();
         eventHandler(event.target.stateSearch.value);
@@ -241,7 +215,6 @@ const searchPageLinkEvent = () => {
         await loadCovidApiData();
         renderSearchPage();
         submitEvent();
-        inputEvent();
     });  
 };
 
