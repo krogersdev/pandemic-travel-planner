@@ -197,7 +197,7 @@ const getWeatherData = async(stateName) => {
     weatherData = data
     
     let weatherArray = Object.entries(weatherData.forecast)
-    weatherArray.forEach(forecast => renderWeatherData(forecast[1]))  //forEach does not wait for promises
+    weatherArray.map(forecast => renderWeatherData(forecast[1]))  //forEach does not wait for promises
 }
 
 const homePageLinkEvent = () => {
