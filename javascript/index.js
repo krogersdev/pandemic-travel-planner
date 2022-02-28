@@ -153,13 +153,11 @@ const renderCovidData = (statesData) => {
 
 /** Event Handler  **/
 const eventHandler = (userInput) => {
-    console.log(userInput);
     let matches = statesData.filter(obj => { 
         const regex = new RegExp(`^${userInput}`, 'gi');
         
         return obj.state.match(regex)
     })
-        console.log('filtered',matches);
     if (matches.length === 1) {
         renderCovidData(matches);
         getWeatherData(matches)
