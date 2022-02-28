@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
   <!-- Compiled and minified JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-<title>Pandemic Travel Planner</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pandemic Travel Planner</title>
 </head>
-<body>
-  <nav class="blue darken-2">
-     <div class="nav-wrapper container">
+<body> 
+  <nav class="nav-wrapper blue darken-2">
+     <div class="container">
       <a href="#" class="brand-logo" id="home-page-link">Pandemic Travel Planner</a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="#" id="search-page-link">search Locations</a></li>
+      <a href="#" class="sidenav-trigger" data-target="mobile-demo">
+        <i class="material-icons">menu</i>
+      </a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#" id="search-page-link">search location</a></li>
       </ul>
      </div>
   </nav>
-  <div class="container" id="main"> 
+  <ul class="sidenav" id="mobile-demo">
+    <li><a href="#" id="search-page-link" class="sidenav-trigger">search Locations</a></li>
+  </ul>
+  <div class="container"> 
+    <div id="main">
+    </div>
   </div>
     <script src="javascript/index.js"></script>
 </body>

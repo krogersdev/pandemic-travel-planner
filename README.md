@@ -31,6 +31,10 @@ This webapp was made with the intentions of equipping domestic travelers in the 
 ![Location stats and Weather](img/step3.gif)
 
 
+## Mobile version
+![Location stats and Weather](img/mobile.gif)
+
+
 ## Built with
 
 - Vanilla JavaScript 
